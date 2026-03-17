@@ -6,6 +6,8 @@ import Pagination from "../../components/ui/Pagination.astro";
 import PostItem from "../../components/blog/PostItem.astro";
 import type { GetStaticPathsOptions } from "astro";
 
+export const prerender = true;
+
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const blogEntries = await getCollection("blog");
   const sortedPosts = blogEntries

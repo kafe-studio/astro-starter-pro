@@ -4,6 +4,8 @@ import Schema from "../../components/seo/Schema.astro";
 
 import { getCollection, render } from "astro:content";
 
+export const prerender = true;
+
 export async function getStaticPaths() {
   const blog = await getCollection("blog");
   return blog.map((post) => ({
