@@ -18,8 +18,6 @@ import Schema from "../components/seo/Schema.astro";
 import Navbar from "../components/layout/Navbar.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/global.css";
-import SpeedInsights from "@vercel/speed-insights/astro";
-import Analytics from "@vercel/analytics/astro";
 
 import { siteConfig } from "../config/site";
 
@@ -96,8 +94,6 @@ const finalIgnoreTitleTemplate = metadata?.ignoreTitleTemplate || false;
       </main>
       <Footer />
     </div>
-    <SpeedInsights />
-    <Analytics />
     <script>
       const setupObserver = () => {
         const observerOptions = {
