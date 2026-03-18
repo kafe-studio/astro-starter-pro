@@ -1,0 +1,65 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Agent",
+      "TodoWrite",
+      "Skill",
+      "NotebookEdit"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"AUDIT REMINDER: Soubor upraven. PŘED DOKONČENÍM MUSÍŠ: 1) Přečti soubor zpět a ověř správnost, 2) Spusť tsc --noEmit pro dotčené TS apps, 3) WebSearch 2026 docs pro každou použitou knihovnu/API, 4) Zkontroluj logiku a edge cases.\"}}'",
+            "statusMessage": "Audit reminder..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-files.js\"",
+            "statusMessage": "Checking file access..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Review whether the assistant properly completed its coding work.\n\nFIRST: Check if the assistant made any code changes (Edit/Write tool calls on source files like .ts, .tsx, .svelte, .astro, .js, .css). If the assistant ONLY answered questions, did research, or had a discussion WITHOUT modifying code files, respond {\"ok\": true}.\n\nIF code WAS modified, verify ALL:\n1) READBACK: Every modified file was Read back AFTER editing to verify changes\n2) TSC: For TypeScript changes, tsc --noEmit was run with 0 errors (apps/api → pnpm exec tsc -p apps/api/tsconfig.json --noEmit, packages/db → pnpm exec tsc -p packages/db/tsconfig.json --noEmit)\n3) WEBSEARCH: WebSearch was used for current 2026 documentation of libraries/APIs used in changes (Effect TS, Astro, Svelte, Cloudflare, etc.) — training data is 2 years old, current docs are mandatory\n4) CODE QUALITY: No hardcoded values, no TODO/FIXME placeholders, no copy-paste leftovers, no missing error handling, no eslint-disable\n5) EFFECT TS (if applicable): No async/await, no .pipe() method (standalone pipe()), Data.TaggedError for errors, Schema.Class for models, Effect.tryPromise at boundaries\n6) SECURITY: No injection, no exposed secrets, input validation at boundaries\n\nIf ANY check was skipped, respond {\"ok\": false, \"reason\": \"Audit incomplete: [specific missing items]\"}.\nIf all passed, respond {\"ok\": true}."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'REMINDER po kompakci: 1) Effect TS strict — no async/await, standalone pipe(), Data.TaggedError, Schema.Class 2) VŽDY WebSearch 2026 docs PŘED implementací 3) TSC check po editaci TS 4) Komunikuj ČESKY 5) Audituj každou změnu'"
+          }
+        ]
+      }
+    ]
+  }
+}
